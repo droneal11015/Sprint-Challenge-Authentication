@@ -45,7 +45,7 @@ function login(req, res) {
 
 function getJokes(req, res) {
   const requestOptions = {
-    headers: { accept: 'application/json' },
+    headers: { accept: 'application/json' }, 
   };
 
     axios
@@ -66,7 +66,7 @@ function generateToken(user) {
     password: user.password 
   }
 
-  const secretKey = "asdlfsahvanu*aelrjafasd(secretkey)*uavn"; 
+  const secretKey = "mySecretKey"; 
 
   const signOptions = {
     expiresIn: "24h",
