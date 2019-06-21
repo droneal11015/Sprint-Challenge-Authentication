@@ -53,6 +53,8 @@ function generateToken(user) {
       subject: user.id,
       username: user.username
   }
+  const secret = 'aasdfjk(;k*lkasdjfa)kjsdf'
+  
   const options = {
       expiresIn: '2d'
   }
