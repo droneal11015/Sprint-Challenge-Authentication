@@ -1,9 +1,10 @@
 const axios = require('axios');
+const db = require("../database/dbConfig.js")
+
+
+const bcrypt = require("bcryptjs");
 const { authenticate } = require('../auth/authenticate');
-const bcrypt = require('bcryptjs');
-const secrets = require('../config/secrets.js');
 const jwt = require('jsonwebtoken');
-const Users = require('../users/user-model.js');
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -11,62 +12,65 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
+
 function register(req, res) {
- let user = req.body;
 
- const hash = bcrypt.hashSync(user.password, 10);
- user.password = hash;
+  user = req.body; 
+  const password = bcrypt.hashSync(req.body.password);
+  user.password = password; 
 
- Users.add(user)
- .then(saved => {
-   res.status(201).json(saved);
- })
- .catch(err => {
-   res.status(500).json(err);
- })
+   db("users").insert(user)
+    .then(() => res.status(200).json({message: "User successfully registered."}))
+    .catch(() => res.status(500).json({errormessage: "Registration Error. Please try again."}))
 }
 
 function login(req, res) {
-  let { username, password } = req.body;
 
-  Users.findBy({ username })
-    .first()
-    .then(user => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-          const token = generateToken(user);
+  const {username,password} = req.body;
 
-          res.status(200).json({
-              message: `Welcome ${user.username}!`,
-              token,
-          });
-      } else {
-          res.status(401).json({ message: 'Credentials not accepted'});
+  db("users").where({username}).then(
+    user => {
+
+      if(user && bcrypt.compareSync(password,user[0].password) )  {
+        const token = generateToken(user);
+
+        res.status(200).send(token);
       }
-  })
-  .catch(err => {
-      res.status(500).json(err);
-  });
+      else {
+        res.status(401).json({errorMessage: "Credentials are not valid. Please try again."})
+      }
+    }  
+  )
 }
 
-function generateToken(user) {
-  const payload = {
-      subject: user.id,
-      username: user.username
-  }
-  const secret = 'aasdfjk(;k*lkasdjfa)kjsdf'
-  
-  const options = {
-      expiresIn: '2d'
-  }
-  return jwt.sign(payload, secrets.jwtKey, options)
-}
+function getJokes(req, res) {
+  const requestOptions = {
+    headers: { accept: 'application/json' },
+  };
 
-
-  axios
-    .get('https://icanhazdadjoke.com/search', requestOptions)
-    .then(response => {
+    axios
+      .get('https://icanhazdadjoke.com/search', requestOptions)
+      .then(response => {
       res.status(200).json(response.data.results);
-    })
+      })
     .catch(err => {
       res.status(500).json({ message: 'Error Fetching Jokes', error: err });
     });
+  }
+
+
+
+function generateToken(user) {
+  const payload = {
+    username: user.username,
+    password: user.password 
+  }
+
+  const secretKey = "asdlfsahvanu*aelrjafasd(secretkey)*uavn"; 
+
+  const signOptions = {
+    expiresIn: "24h",
+  }; 
+
+  return jwt.sign(payload,secretKey,signOptions);
+}
