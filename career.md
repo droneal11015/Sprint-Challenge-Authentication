@@ -1,0 +1,3 @@
+https://app.huntr.co/app/track/boards/5cc7158c9fa2b5000fa75fc7/board
+
+My resume, linked in and cover letter were updated last week. I have searched for multiple jobs in the Atlanta area as well as remote positions throughout. My cover letter has been tailored to insert certain things specific to each job, such as name of company, position, and why I would be a good fit for that position. I have a lot of the qualifications needed, such as experience in JS, React, HTML/CSS, Node, but some of them require many years of experience, which I haven't obtained yet. I also started working more on my web portfolio to tailor it with my current qualifications and projects. When complete, it will be hosted on danioneal.dev. 
