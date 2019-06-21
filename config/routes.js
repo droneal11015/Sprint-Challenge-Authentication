@@ -9,7 +9,26 @@ module.exports = server => {
 };
 
 function register(req, res) {
-  // implement user registration
+  let user = req.body;
+    if (!user.username || !user.password) {
+        return res.status(500).json({message: 'Must provide username and password'});
+    }
+
+    if (user.password.length < 0) {
+        return res.status(400).json({message:'Please enter a password'})
+    }
+
+    const hash = bcrypt.hashSync(user.password, 10);
+
+    user.password = hash;
+
+    User.add(user)
+    .then(saved => {
+        res.status(201).json(saved);
+    })
+    .catch(error => {
+        res.status(500).json({message: 'An error occurred trying to register. Please try again.'})
+    });
 }
 
 function login(req, res) {
